@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <title>流式测试</title>
+  </head>
+  <body>
+    <div id="output" style="white-space: pre-wrap"></div>
+    <script>
+      async function testStream() {
+        const response = await fetch("http://localhost:3001/chat/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: "讲一个笑话" }],
+          }),
+        });
+        //response.body  是一个ReadableStream（可读流），用于读取响应体数据。
+        // .getReader() 获得一个流读取器，可以逐块读取数据
+        const reader = response.body.getReader();
+        // 用于将二进制数据块（Uint8Array）解码为字符串（默认 UTF-8）
+        const decoder = new TextDecoder();
+        let result = "";
+        // 无限循环读取流中的每个数据块
+        while (true) {
+          // reader.read() 返回一个 Promise，解析为 { done, value }
+          const { done, value } = await reader.read();
+          if (done) break;
+          //将二进制块解码为字符串 chunk
+          const chunk = decoder.decode(value);
+          // SSE 数据格式：data: {...}\n\n
+          /**
+           * SSE协议中每个事件以\n 分隔，事件之间以\n\n分隔   按行处理是常见的解析方式
+           * */
+          const lines = chunk.split("\n");
+          for (let line of lines) {
+            if (line.startsWith("data: ")) {
+              // 提取到JSON内容
+              const data = line.slice(6);
+              if (data === "[DONE]") continue;
+              try {
+                const json = JSON.parse(data);
+                if (json.content) {
+                  result += json.content;
+                  document.getElementById("output").innerText = result;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+      }
+      testStream();
+    </script>
+  </body>
+</html>

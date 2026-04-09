@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 智能助理</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f172a;
+        --panel: #111827;
+        --panel-soft: #1f2937;
+        --border: rgba(148, 163, 184, 0.18);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --accent-strong: #60a5fa;
+        --danger: #fb7185;
+        --shadow: 0 20px 50px rgba(15, 23, 42, 0.45);
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            circle at top,
+            rgba(56, 189, 248, 0.16),
+            transparent 24%
+          ),
+          linear-gradient(180deg, #020617 0%, #0b1122 100%);
+        color: var(--text);
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .layout {
+        width: min(1040px, 100%);
+      }
+
+      .panel {
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .header {
+        padding: 32px 36px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .header-title {
+        margin: 0;
+        font-size: clamp(1.4rem, 1.6vw, 2rem);
+        letter-spacing: -0.03em;
+      }
+
+      .header-subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .content {
+        display: grid;
+        gap: 24px;
+        padding: 32px 36px 40px;
+      }
+
+      .input-group {
+        display: grid;
+        gap: 16px;
+      }
+
+      .input-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+      }
+
+      #input {
+        width: 100%;
+        min-height: 52px;
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        padding: 0 18px;
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--text);
+        font-size: 1rem;
+        outline: none;
+      }
+
+      #input:focus {
+        border-color: rgba(56, 189, 248, 0.55);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+      }
+
+      button {
+        border: none;
+        border-radius: 16px;
+        padding: 0 24px;
+        background: linear-gradient(
+          135deg,
+          var(--accent),
+          var(--accent-strong)
+        );
+        color: #0f172a;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 30px rgba(56, 189, 248, 0.24);
+      }
+
+      .result-card {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 24px;
+        padding: 24px;
+        min-height: 240px;
+      }
+
+      .result-title {
+        margin: 0 0 16px;
+        color: var(--accent);
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      #result {
+        white-space: pre-wrap;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        color: var(--text);
+        line-height: 1.75;
+        font-size: 0.96rem;
+        max-height: 360px;
+        min-height: 360px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .footer {
+        padding: 0 36px 28px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 20px;
+        }
+
+        .header,
+        .content,
+        .footer {
+          padding-left: 24px;
+          padding-right: 24px;
+        }
+
+        .input-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <section class="panel">
+        <header class="header">
+          <div>
+            <h1 class="header-title">AI 智能对话助手</h1>
+            <p class="header-subtitle">
+              支持流式响应显示，适合企业级控制台体验。输入问题后，助手会按需实时渲染结果。
+            </p>
+          </div>
+        </header>
+
+        <div class="content">
+          <div class="input-group">
+            <div class="input-row">
+              <input
+                id="input"
+                type="text"
+                placeholder="请输入您的问题，例如：今天的工作总结怎么写？"
+              />
+              <button onclick="clickSend()">发送消息</button>
+            </div>
+            <div class="result-card">
+              <p class="result-title">AI 回复内容</p>
+              <div id="result">等待输入后开始会话...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="footer">
+        服务接口地址：<code>http://localhost:3001/chatMessage/stream</code>
+      </div>
+    </div>
+
+    <script>
+      // 生成唯一会话 ID 并保存到 sessionStorage，用于服务端保持会话状态
+      const key = new Date().getTime();
+      window.sessionStorage.setItem("sessionId", key);
+      const sessionId = window.sessionStorage.getItem("sessionId");
+
+      const result = document.querySelector("#result");
+      const input = document.querySelector("#input");
+      let fullContent = "";
+
+      // 结果区自动滚动到底部，避免用户需要手动拖动滚动条
+      const scrollResultToBottom = () => {
+        result.scrollTop = result.scrollHeight;
+      };
+
+      // 非流式接口调用方式（当前未启用）
+      const getAIChat = async (messages) => {
+        const res = await fetch("http://localhost:3001/chatMessage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages,
+            sessionId,
+          }),
+        });
+        const data = await res.json();
+        let aiMsg = data.data.aiMsg;
+        result.textContent = aiMsg;
+        scrollResultToBottom();
+      };
+
+      // 流式调用：逐步接收服务端返回的流式数据，实时拼接并显示
+      const getAIChatStream = async (messages) => {
+        try {
+          const res = await fetch("http://localhost:3001/chatMessage/stream", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              messages,
+              sessionId,
+            }),
+          });
+          // 读流器
+          const reader = res.body.getReader();
+          // 解码为字符串
+          const docoder = new TextDecoder();
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = docoder.decode(value);
+            const lines = chunk.split("\n");
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6);
+                if (data === "[DONE]") continue;
+                const content = JSON.parse(data)?.content || "";
+                fullContent += content;
+                result.textContent = fullContent;
+                // 每次追加新内容后滚动到底部，保持最新消息可见
+                scrollResultToBottom();
+              }
+            }
+          }
+        } catch (error) {
+          console.log(error, "错误");
+        }
+      };
+
+      const clickSend = () => {
+        fullContent = "";
+        if (!input.value) return alert("请先输入");
+        // 使用流式接口实现实时输出
+        getAIChatStream(input.value);
+        input.value = "";
+      };
+
+      const getHis = async () => {
+        const res = await fetch(
+          "http://localhost:3001/chatMessage/getHistory?sessionId=1775646444940",
+        );
+        console.log(await res.json(), "获取的Map数据");
+      };
+      getHis();
+    </script>
+  </body>
+</html>
