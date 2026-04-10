@@ -16,6 +16,6 @@ app.use((err, request, response, next) => {
     error: err,
   });
 });
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log("服务已启动，监听http://localhost:" + PORT);
 });
