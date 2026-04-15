@@ -1,174 +1,189 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>会话列表</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>会话列表</title>
-  <link rel="stylesheet" href="./styles.css" />
-</head>
-
-<body>
-  <div class="app-shell">
-    <section class="panel panel-side">
-      <div class="panel-header">
-        <h1 class="panel-title">会话列表</h1>
-        <p class="panel-description">
-          企业级 AI 会话管理，支持快速切换、查看历史对话与删除会话。
-        </p>
-        <button id="newChatBtn" class="new-chat-button" type="button">
-          + 新对话
-        </button>
-      </div>
-      <!-- 会话历史 -->
-      <div class="session-list" id="sessionList"></div>
-    </section>
-
-    <section class="panel chat-panel">
-      <div class="chat-header">
-        <div class="chat-title-group">
-          <h2 class="chat-title">AI 客服会话</h2>
-          <p class="chat-description">
-            接入企业级大模型，支持实时流式返回。当前对话结果区将自动跟随最新内容。
+  <body>
+    <div class="app-shell">
+      <section class="panel panel-side">
+        <div class="panel-header">
+          <h1 class="panel-title">会话列表</h1>
+          <p class="panel-description">
+            企业级 AI 会话管理，支持快速切换、查看历史对话与删除会话。
           </p>
+          <button id="newChatBtn" class="new-chat-button" type="button">
+            + 新对话
+          </button>
         </div>
-        <div class="chat-status">
-          <span class="chat-badge">在线</span>
-        </div>
-      </div>
+        <!-- 会话历史 -->
+        <div class="session-list" id="sessionList"></div>
+      </section>
 
-      <div class="chat-body">
-        <div class="message-area">
-          <div class="message-list" id="messageList">
-            <div class="message ai">
-              <span class="message-label">AI 回复</span>
-              你好！我是企业 AI
-              客服助手，请在下方输入你的问题，我会为你提供详细解答。
+      <section class="panel chat-panel">
+        <div class="chat-header">
+          <div class="chat-title-group">
+            <h2 class="chat-title">AI 客服会话</h2>
+            <p class="chat-description">
+              接入企业级大模型，支持实时流式返回。当前对话结果区将自动跟随最新内容。
+            </p>
+          </div>
+          <div class="chat-status">
+            <span class="chat-badge">在线</span>
+          </div>
+        </div>
+
+        <div class="chat-body">
+          <div class="message-area">
+            <div class="message-list" id="messageList">
+              <div class="message ai">
+                <span class="message-label">AI 回复</span>
+                你好！我是企业 AI
+                客服助手，请在下方输入你的问题，我会为你提供详细解答。
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="chat-footer">
-          <div class="chat-input-row">
-            <input id="chatInput" class="chat-input" type="text" placeholder="请输入咨询内容，例如：我的订单为什么延迟？" />
-            <button id="sendButton" class="send-button" type="button">
-              发送
-            </button>
+          <div class="chat-footer">
+            <div class="chat-input-row">
+              <input
+                id="chatInput"
+                class="chat-input"
+                type="text"
+                placeholder="请输入咨询内容，例如：我的订单为什么延迟？"
+              />
+              <button id="sendButton" class="send-button" type="button">
+                发送
+              </button>
+            </div>
+            <p class="footer-note">
+              输入并发送后，消息会追加到结果区，滚动条会自动保持在最新位置。
+            </p>
           </div>
-          <p class="footer-note">
-            输入并发送后，消息会追加到结果区，滚动条会自动保持在最新位置。
-          </p>
         </div>
-      </div>
-    </section>
-  </div>
+      </section>
+    </div>
 
-  <script>
-    const SESSION_STORAGE_KEY = "sessionId";
-    const MAX_SESSION_COUNT = 10;
-    const getSessionStore = () => {
-      const saved = window.localStorage.getItem(SESSION_STORAGE_KEY);
-      let parsed = [];
-      try {
-        parsed = JSON.parse(saved || "[]");
-      } catch (error) {
-        parsed = [];
-      }
-      if (!Array.isArray(parsed)) {
-        parsed = [];
-      }
-      return parsed;
-    };
-    const createSessionId = () => {
-      const sessions = getSessionStore();
-      const nextId = crypto.randomUUID();
-      sessions.push(nextId);
-      if (sessions.length > MAX_SESSION_COUNT) {
-        sessions.splice(0, sessions.length - MAX_SESSION_COUNT);
-      }
-      window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessions));
-      return nextId;
-    };
+    <script>
+      const SESSION_STORAGE_KEY = "sessionId";
+      const MAX_SESSION_COUNT = 10;
+      // 处理session
+      const getSessionStore = () => {
+        const saved = window.localStorage.getItem(SESSION_STORAGE_KEY);
+        let parsed = [];
+        try {
+          parsed = JSON.parse(saved || "[]");
+        } catch (error) {
+          parsed = [];
+        }
+        if (!Array.isArray(parsed)) {
+          parsed = [];
+        }
+        return parsed;
+      };
+      // 增加 sessionId
+      const createSessionId = () => {
+        const sessions = getSessionStore();
+        const nextId = crypto.randomUUID();
+        sessions.push(nextId);
+        if (sessions.length > MAX_SESSION_COUNT) {
+          sessions.splice(0, sessions.length - MAX_SESSION_COUNT);
+        }
+        window.localStorage.setItem(
+          SESSION_STORAGE_KEY,
+          JSON.stringify(sessions),
+        );
+        return nextId;
+      };
 
-    let sessionId = createSessionId();
-    const url = "http://localhost:3001";
-    const messageList = document.querySelector("#messageList");
-    const chatInput = document.querySelector("#chatInput");
-    const sendButton = document.querySelector("#sendButton");
-    const sessionList = document.querySelector("#sessionList");
-    const newChatBtn = document.querySelector("#newChatBtn");
-    // AI流回复文本
-    let fullAnswer = "";
-    //  会话历史
-    let aiChatHistory = [];
+      let sessionId = createSessionId();
+      // const url = "https://ai-node-production-3218.up.railway.app";
+      const url = "http://localhost:3001";
+      const messageList = document.querySelector("#messageList");
+      const chatInput = document.querySelector("#chatInput");
+      const sendButton = document.querySelector("#sendButton");
+      const sessionList = document.querySelector("#sessionList");
+      const newChatBtn = document.querySelector("#newChatBtn");
+      // AI流回复文本
+      let fullAnswer = "";
+      //  会话历史
+      let aiChatHistory = [];
 
-    const scrollToBottom = () => {
-      messageList.scrollTop = messageList.scrollHeight;
-    };
-    const scrollSessionList = () => {
-      sessionList.scrollTop = sessionList.scrollHeight;
-    };
-    const resetMessageList = () => {
-      messageList.innerHTML = `
+      const scrollToBottom = () => {
+        messageList.scrollTop = messageList.scrollHeight;
+      };
+      const scrollSessionList = () => {
+        sessionList.scrollTop = sessionList.scrollHeight;
+      };
+      const resetMessageList = () => {
+        messageList.innerHTML = `
           <div class="message ai">
             <span class="message-label">AI 回复</span>
             你好！我是企业 AI 客服助手，请在下方输入你的问题，我会为你提供详细解答。
           </div>
         `;
-      fullAnswer = "";
-      chatInput.value = "";
-      scrollToBottom();
-    };
-    const renderSessionMessages = (sessionData = []) => {
-      const history = sessionData.filter(
-        (msg) => msg?.role === "user" || msg?.role === "assistant",
-      );
-      if (!history.length) {
-        resetMessageList();
-        return;
-      }
-      messageList.innerHTML = "";
-      history.forEach((msg) => {
-        const div = document.createElement("div");
-        div.className = msg.role === "user" ? "message user" : "message ai";
-        div.textContent = msg.content || "";
-        messageList.appendChild(div);
-      });
-      fullAnswer = "";
-      chatInput.value = "";
-      scrollToBottom();
-    };
-    const removeSessionFromStore = (targetSessionId) => {
-      const sessions = getSessionStore().filter((id) => id !== targetSessionId);
-      window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessions));
-      return sessions;
-    };
-    const deleteHistoryBySessionId = async (targetSessionId) => {
-      const response = await fetch(
-        `${url}/chatMessage/delHistory/${encodeURIComponent(targetSessionId)}`,
-      );
-      if (!response.ok) {
-        throw new Error("删除会话失败");
-      }
-      return response.json();
-    };
-    const debounce = (fn, wait = 300) => {
-      let timer = null;
-      return (...args) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          fn(...args);
-        }, wait);
+        fullAnswer = "";
+        chatInput.value = "";
+        scrollToBottom();
       };
-    };
+      const renderSessionMessages = (sessionData = []) => {
+        const history = sessionData.filter(
+          (msg) => msg?.role === "user" || msg?.role === "assistant",
+        );
+        if (!history.length) {
+          resetMessageList();
+          return;
+        }
+        messageList.innerHTML = "";
+        history.forEach((msg) => {
+          const div = document.createElement("div");
+          div.className = msg.role === "user" ? "message user" : "message ai";
+          div.textContent = msg.content || "";
+          messageList.appendChild(div);
+        });
+        fullAnswer = "";
+        chatInput.value = "";
+        scrollToBottom();
+      };
+      const removeSessionFromStore = (targetSessionId) => {
+        const sessions = getSessionStore().filter(
+          (id) => id !== targetSessionId,
+        );
+        window.localStorage.setItem(
+          SESSION_STORAGE_KEY,
+          JSON.stringify(sessions),
+        );
+        return sessions;
+      };
+      const deleteHistoryBySessionId = async (targetSessionId) => {
+        const response = await fetch(
+          `${url}/chatMessage/delHistory/${encodeURIComponent(targetSessionId)}`,
+        );
+        if (!response.ok) {
+          throw new Error("删除会话失败");
+        }
+        return response.json();
+      };
+      const debounce = (fn, wait = 300) => {
+        let timer = null;
+        return (...args) => {
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            fn(...args);
+          }, wait);
+        };
+      };
 
-    const createDiv = (item, content) => {
-      const div = document.createElement("div");
+      const createDiv = (item, content) => {
+        const div = document.createElement("div");
 
-      div.className = "session-item";
-      div.setAttribute("data-session-id", item.sessionId);
-      div.id = item.sessionId;
-      div.innerHTML = `
+        div.className = "session-item";
+        div.setAttribute("data-session-id", item.sessionId);
+        div.id = item.sessionId;
+        div.innerHTML = `
                     <div class="session-main">
                     <span class="session-title">${content}</span>
                      <small class="session-time">09:08</small>
@@ -177,172 +192,179 @@
                      ×
                    </button>
               `;
-      sessionList.appendChild(div);
-      scrollSessionList();
-    };
+        sessionList.appendChild(div);
+        scrollSessionList();
+      };
 
-    //   获取会话记录
-    const getChatMsg = async () => {
-      try {
-        const response = await fetch(`${url}/chatMessage/getAllHistory`, {
-          cache: "no-store",
-        });
-        const res = await response.json();
-        aiChatHistory = res.data || [];
-        
-        aiChatHistory.forEach((item) => {
-          const content = item.data.find(msg => msg.role === 'user')[0]?.content || '新会话';
-          let div = sessionList.querySelector(
-            `[data-session-id="${item.sessionId}"]`,
-          );
-          if (div) {
-            // 更新,并且只更新title  session-title
-            const title = div.querySelector(".session-title");
-            if (title && title.textContent !== content) {
-              title.textContent = content;
-            }
-          } else {
-            createDiv(item, content);
-          }
-        });
-      } catch (error) {
-        console.log(error, "error");
-      }
-    };
-    getChatMsg();
+      //   获取会话记录
+      const getChatMsg = async () => {
+        try {
+          const response = await fetch(`${url}/chatMessage/getAllHistory`, {
+            cache: "no-store",
+          });
+          const res = await response.json();
+          aiChatHistory = res.data || [];
 
-    //   发送AI消息
-    const fetchAIMsg = async (messages) => {
-      try {
-        const div = document.createElement("div");
-        div.className = "message ai";
-        let res = await fetch("http://localhost:3001/chatMessage/stream", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ messages, sessionId }),
-        });
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        messageList.appendChild(div);
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value);
-          const lines = chunk.split("\n");
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") continue;
-              const parseData = JSON.parse(data);
-              const content = parseData?.content || "";
-              if (content) {
-                fullAnswer += content;
-                div.textContent = fullAnswer;
-                scrollToBottom();
+          aiChatHistory.forEach((item) => {
+            const content =
+              item.data.find((msg) => msg.role === "user")?.content || "新会话";
+            console.log(
+              content,
+              "content",
+              item.data,
+              item.data.find((msg) => msg.role === "user"),
+            );
+
+            let div = sessionList.querySelector(
+              `[data-session-id="${item.sessionId}"]`,
+            );
+            if (div) {
+              // 更新,并且只更新title  session-title
+              const title = div.querySelector(".session-title");
+              if (title && title.textContent !== content) {
+                title.textContent = content;
               }
+            } else {
+              createDiv(item, content);
             }
-          }
+          });
+        } catch (error) {
+          console.log(error, "error");
         }
-      } catch (error) { }
-    };
-
-    const sendMessage = async () => {
-      const value = chatInput.value.trim();
-      if (!value) return;
-      chatInput.value = "";
-      fullAnswer = "";
-
-      const userDiv = document.createElement("div");
-      userDiv.className = "message user";
-      userDiv.textContent = value;
-      messageList.appendChild(userDiv);
-      await fetchAIMsg(value);
-
+      };
       getChatMsg();
-    };
-    const debouncedSendMessage = debounce(sendMessage, 300);
-    sendButton.addEventListener("click", () => {
-      debouncedSendMessage();
-    });
-    // 绑定Enter事件
-    chatInput.addEventListener("keydown", (event) => {
-      // Enter 发送；输入法组合中不触发，避免误发送
-      if (event.key === "Enter" && !event.isComposing) {
-        event.preventDefault();
-        debouncedSendMessage();
-      }
-    });
-    // 绑定新对话按钮事件
-    newChatBtn.addEventListener("click", () => {
-      sessionId = createSessionId();
-      resetMessageList();
-    });
 
-    sessionList.addEventListener("click", (event) => {
-
-      const deleteBtn = event.target.closest(".delete-session");
-      if (deleteBtn) {
-        const item = deleteBtn.closest(".session-item");
-        if (item) {
-          const title =
-            item.querySelector(".session-title")?.textContent || "该会话";
-          const confirmed = window.confirm(`确定要删除会话“${title}”吗？`);
-          if (!confirmed) return;
-          const targetSessionId = item.dataset.sessionId;
-          deleteHistoryBySessionId(targetSessionId)
-            .then(() => {
-              item.remove();
-              aiChatHistory = aiChatHistory.filter(
-                (chat) => chat.sessionId !== targetSessionId,
-              );
-              removeSessionFromStore(targetSessionId);
-
-              if (sessionId === targetSessionId) {
-                const fallbackSession = aiChatHistory[aiChatHistory.length - 1];
-                if (fallbackSession) {
-                  sessionId = fallbackSession.sessionId;
-                  renderSessionMessages(fallbackSession.data || []);
-                  const activeNode = sessionList.querySelector(
-                    `[data-session-id="${fallbackSession.sessionId}"]`,
-                  );
-                  document
-                    .querySelectorAll(".session-item")
-                    .forEach((node) => node.classList.remove("active"));
-                  activeNode?.classList.add("active");
-                } else {
-                  sessionId = createSessionId();
-                  resetMessageList();
+      //   发送AI消息
+      const fetchAIMsg = async (message) => {
+        try {
+          const div = document.createElement("div");
+          div.className = "message ai";
+          let res = await fetch(`${url}/chatMessage/agentToolStream`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message, sessionId }),
+          });
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          messageList.appendChild(div);
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6);
+                if (data === "[DONE]") continue;
+                const parseData = JSON.parse(data);
+                const content = parseData?.content || "";
+                if (content) {
+                  fullAnswer += content;
+                  div.textContent = fullAnswer;
+                  scrollToBottom();
                 }
               }
-            })
-            .catch((error) => {
-              console.log(error, "delete error");
-              window.alert("删除失败，请稍后重试");
-            });
+            }
+          }
+        } catch (error) {}
+      };
+
+      const sendMessage = async () => {
+        const value = chatInput.value.trim();
+        if (!value) return;
+        chatInput.value = "";
+        fullAnswer = "";
+
+        const userDiv = document.createElement("div");
+        userDiv.className = "message user";
+        userDiv.textContent = value;
+        messageList.appendChild(userDiv);
+        scrollToBottom();
+        await fetchAIMsg(value);
+        getChatMsg();
+      };
+      const debouncedSendMessage = debounce(sendMessage, 300);
+      sendButton.addEventListener("click", () => {
+        debouncedSendMessage();
+      });
+      // 绑定Enter事件
+      chatInput.addEventListener("keydown", (event) => {
+        // Enter 发送；输入法组合中不触发，避免误发送
+        if (event.key === "Enter" && !event.isComposing) {
+          event.preventDefault();
+          debouncedSendMessage();
         }
-        return;
-      }
+      });
+      // 绑定新对话按钮事件
+      newChatBtn.addEventListener("click", () => {
+        sessionId = createSessionId();
+        resetMessageList();
+      });
 
-      const item = event.target.closest(".session-item");
-      if (item) {
-        document
-          .querySelectorAll(".session-item")
-          .forEach((node) => node.classList.remove("active"));
-        item.classList.add("active");
+      sessionList.addEventListener("click", (event) => {
+        const deleteBtn = event.target.closest(".delete-session");
+        if (deleteBtn) {
+          const item = deleteBtn.closest(".session-item");
+          if (item) {
+            const title =
+              item.querySelector(".session-title")?.textContent || "该会话";
+            const confirmed = window.confirm(`确定要删除会话“${title}”吗？`);
+            if (!confirmed) return;
+            const targetSessionId = item.dataset.sessionId;
+            deleteHistoryBySessionId(targetSessionId)
+              .then(() => {
+                item.remove();
+                aiChatHistory = aiChatHistory.filter(
+                  (chat) => chat.sessionId !== targetSessionId,
+                );
+                removeSessionFromStore(targetSessionId);
 
-        const clickedSessionId = item.dataset.sessionId;
-        sessionId = clickedSessionId;
-        const currentSession = aiChatHistory.find(
-          (chat) => chat.sessionId === clickedSessionId,
-        );
-        renderSessionMessages(currentSession?.data || []);
-      }
-    });
-    scrollToBottom();
-    scrollSessionList();
-  </script>
-</body>
+                if (sessionId === targetSessionId) {
+                  const fallbackSession =
+                    aiChatHistory[aiChatHistory.length - 1];
+                  if (fallbackSession) {
+                    sessionId = fallbackSession.sessionId;
+                    renderSessionMessages(fallbackSession.data || []);
+                    const activeNode = sessionList.querySelector(
+                      `[data-session-id="${fallbackSession.sessionId}"]`,
+                    );
+                    document
+                      .querySelectorAll(".session-item")
+                      .forEach((node) => node.classList.remove("active"));
+                    activeNode?.classList.add("active");
+                  } else {
+                    sessionId = createSessionId();
+                    resetMessageList();
+                  }
+                }
+              })
+              .catch((error) => {
+                console.log(error, "delete error");
+                window.alert("删除失败，请稍后重试");
+              });
+          }
+          return;
+        }
 
+        const item = event.target.closest(".session-item");
+        if (item) {
+          document
+            .querySelectorAll(".session-item")
+            .forEach((node) => node.classList.remove("active"));
+          item.classList.add("active");
+
+          const clickedSessionId = item.dataset.sessionId;
+          sessionId = clickedSessionId;
+          const currentSession = aiChatHistory.find(
+            (chat) => chat.sessionId === clickedSessionId,
+          );
+          renderSessionMessages(currentSession?.data || []);
+        }
+      });
+      scrollToBottom();
+      scrollSessionList();
+    </script>
+  </body>
 </html>

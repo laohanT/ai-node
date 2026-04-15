@@ -34,7 +34,7 @@ body {
 }
 
 .app-shell {
-    width: min(1320px, 100%);
+    width: min(1800px, 100%);
     height: calc(100vh - 48px);
     display: grid;
     grid-template-columns: 320px 1fr;
