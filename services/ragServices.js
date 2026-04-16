@@ -74,6 +74,8 @@ async function splitText(text) {
 // ----添加文档（对外接口） -----
 // 参数可以是pdf文件的buffer，或者直接传入文本字符串
 async function addDocument(source, isPdfBuffer = true) {
+  // 初始化
+  chunksStore = [];
   let fullText = "";
   if (isPdfBuffer) {
     // PDF文本提取
@@ -93,15 +95,20 @@ async function addDocument(source, isPdfBuffer = true) {
       embedding,
     });
   }
+
   //   返回切块数量
-  return chunks.length;
+  return {
+    length: chunks.length,
+    chunksStore: chunksStore.map((item) => ({ id: item.id, text: item.text })),
+  };
 }
 
 // ------------检索相似块------------
-async function retrieve(query, topK = 3) {
+async function retrieve(query, topK = 5) {
   // 将用户问题生成向量快
   const queryEmbedding = await getEmbedding(query);
   //   计算每个存储块与查询的相似度，检索最相关的块
+
   const scored = chunksStore.map((chunk) => ({
     text: chunk.text,
     // 对比值

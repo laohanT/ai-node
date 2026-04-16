@@ -11,11 +11,15 @@ const uploadPDF = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "请上传PDF文件" });
     }
-    const chunkCount = await ragServices.addDocument(req.file.buffer, true);
+    const { length, chunksStore } = await ragServices.addDocument(
+      req.file.buffer,
+      true,
+    );
     res.json({
       status: 200,
-      message: `文档已处理，共生成${chunkCount}个文本块`,
-      chunkCount,
+      message: `文档已处理，共生成${length}个文本块`,
+      length,
+      chunksStore,
     });
   } catch (error) {
     console.log(error.message, "上传错误");
