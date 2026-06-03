@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: your-service-name
+    runtime: node
+    plan: free  # 确保这里明确是 free
+    buildCommand: npm install
+    startCommand: npm start
