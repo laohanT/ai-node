@@ -17,6 +17,11 @@ app.use((err, request, response, next) => {
     error: err,
   });
 });
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("服务已启动，监听http://localhost:" + PORT);
-});
+// 仅在直接运行时启动服务器（非 Vercel serverless 环境）
+if (require.main === module) {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log("服务已启动，监听http://localhost:" + PORT);
+  });
+}
+
+module.exports = app;
